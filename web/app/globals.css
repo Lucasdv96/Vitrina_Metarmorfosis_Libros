@@ -124,10 +124,9 @@ nav.links a:hover {
 }
 
 .endpaper {
-  height: 90px;
+  height: 116px;
   background-image: url('/PatronAcomodado2-tile.png');
   background-repeat: repeat-x;
-  opacity: 0.35;
 }
 
 .hero {
