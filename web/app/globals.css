@@ -124,9 +124,8 @@ nav.links a:hover {
 }
 
 .endpaper {
-  height: 120px;
-  background-image: url('/PatronAcomodado2.png');
-  background-size: auto 120px;
+  height: 116px;
+  background-image: url('/PatronAcomodado2-tile.png');
   background-repeat: repeat-x;
 }
 
