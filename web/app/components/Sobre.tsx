@@ -3,15 +3,9 @@ export default function Sobre() {
     <section id="sobre" className="block">
       <div className="wrap about-copy">
         <h2>Sobre mí</h2>
-        <span className="placeholder-note">Texto de ejemplo — reemplazar por tu historia real</span>
+        <span className="placeholder-note">Me llamo Sole y, desde que tengo memoria, me fascinan los libros. Gracias a una vecina aprendí a leer a los cuatro años y, desde entonces, no sé lo que es salir de mi casa sin llevar un libro. A los 23 comencé a trabajar en una librería independiente, pero mucho antes de eso ya había creado este pequeño espacio virtual que hoy sigo intentando mejorar. </span>
         <p>
-          Empecé a vender los libros que se acumulaban en mi biblioteca porque no soportaba verlos
-          juntando polvo. Hoy elijo cada ejemplar a mano, reviso que esté en buen estado y lo
-          cuento acá antes de que encuentre un lugar nuevo.
-        </p>
-        <p>
-          [Contá acá cuánto hace que vendés, por qué te gustan los libros usados, y cualquier otra
-          cosa que quieras que tus lectores sepan de vos.]
+          Metamorfosis nació de este vínculo especial con los libros y de las ganas de que los ejemplares usados puedan seguir circulando y encontrar nuevos lectores. ♡         
         </p>
       </div>
     </section>

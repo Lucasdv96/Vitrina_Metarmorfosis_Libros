@@ -59,7 +59,7 @@ export default function Catalog({ books }: CatalogProps) {
       <div className="wrap">
         <h2>Catálogo</h2>
         <p className="section-lede">
-          {toned.length} libros y sumando. Buscá por título o autor, o filtrá por lo que estés
+          Buscá por título o autor, o filtrá por lo que estés
           buscando.
         </p>
 
