@@ -6,8 +6,8 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import { getBooks } from './lib/books';
 
-export default function Page() {
-  const books = getBooks();
+export default async function Page() {
+  const books = await getBooks();
 
   return (
     <>
