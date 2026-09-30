@@ -17,10 +17,9 @@ export default function Hero() {
         />
       </div>
       <div className="hero-body">
-        <h1>Libros usados, elegidos con cariño</h1>
+        <h1>LIBRERÍA VIRTUAL · LIBROS USADOS</h1>
         <p className="lede">
-          Cada ejemplar pasó por mis manos antes de llegar a las tuyas. Retiro en mano en Mar del
-          Plata o envío a cualquier provincia.
+          Una selección de libros de autoras, terror, literatura japonesa y coreana, cultura pop y más. Retiro en mano en Mar del Plata · Entregas a coordinar   
         </p>
         <div className="hero-ctas">
           <a className="btn btn-primary" href={WHATSAPP_URL} target="_blank" rel="noopener">

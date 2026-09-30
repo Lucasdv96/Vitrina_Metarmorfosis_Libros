@@ -10,14 +10,14 @@ export default function Contact() {
         <div className="contact-grid">
           <div className="contact-card">
             <h3>WhatsApp</h3>
-            <p>Retiro en mano en Mar del Plata o envío por correo a cualquier provincia del país.</p>
+            <p>Coordinar entrega / Pedime más info o fotos</p>
             <a className="btn btn-primary" href={WHATSAPP_URL} target="_blank" rel="noopener">
               Escribir por WhatsApp
             </a>
           </div>
           <div className="contact-card">
             <h3>Instagram</h3>
-            <p>Novedades, nuevos ingresos y el detrás de escena de la librería.</p>
+            <p>Novedades, nuevos ingresos y algunas cositas más. Seguime!</p>
             <a className="btn btn-ghost" href={INSTAGRAM_URL} target="_blank" rel="noopener">
               @libros.metamorfosis
             </a>
