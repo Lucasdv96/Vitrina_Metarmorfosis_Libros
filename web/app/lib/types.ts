@@ -8,4 +8,6 @@ export interface Book {
   precio: number;
   stock: Stock;
   genero?: string;
+  /** URL de la portada resuelta contra Google Books. Ausente si no se encontró. */
+  portada?: string;
 }
