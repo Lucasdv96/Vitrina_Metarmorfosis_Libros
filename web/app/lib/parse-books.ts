@@ -71,6 +71,18 @@ function normalizeStock(raw: string): Stock {
   return raw.trim() === 'Vendido' ? 'Vendido' : 'Disponible';
 }
 
+/**
+ * En la planilla los títulos están tipeados con comillas literales
+ * (ej. "Angeles y demonios"). Las saca para que no se vean en el sitio.
+ */
+function limpiarTitulo(raw: string): string {
+  const t = raw.trim();
+  if (t.length > 1 && t.startsWith('"') && t.endsWith('"')) {
+    return t.slice(1, -1).trim();
+  }
+  return t;
+}
+
 const HEADER_ALIASES: Record<string, string> = {
   libro: 'titulo',
   autor: 'autor',
@@ -82,26 +94,35 @@ const HEADER_ALIASES: Record<string, string> = {
   'género': 'genero',
 };
 
+function isHeaderRow(row: string[]): boolean {
+  return (row[0] ?? '').trim().toLowerCase() === 'libro';
+}
+
 /**
  * Convierte el CSV publicado de la planilla en libros.
  *
- * La hoja "Por género" agrupa los libros en secciones: una fila
- * "[merged] <Género>" (celda combinada) antes de cada grupo, seguida
- * del encabezado de columnas repetido ("Libro, Autor/a, ...") y recién
- * después las filas de libros. También hay filas de categoría suelta
- * ("/ FICCIÓN", "/ NO FICCIÓN") sin relación con ningún género.
+ * La hoja "Por género" agrupa los libros en secciones: una fila con
+ * solo el nombre del género en la primera columna (celda combinada,
+ * el resto de columnas vacías) antes de cada grupo, seguida del
+ * encabezado de columnas repetido ("Libro,Autor/a,..."). La fila 1 del
+ * archivo no es el encabezado — es una categoría suelta ("/ FICCIÓN",
+ * "/ NO FICCIÓN"), así que el encabezado hay que buscarlo en cualquier
+ * parte del archivo, no asumir que es la primera fila.
  *
- * Este parser recorre las filas llevando el "género actual": lo
- * actualiza al pasar por una fila [merged], ignora los encabezados
- * repetidos y las filas de categoría, y asigna ese género a cada libro
- * real. Si en el futuro la planilla vuelve a tener una columna
- * "Género" explícita, se usa esa en vez de la sección.
+ * Este parser busca el primer encabezado real para saber en qué
+ * columna está cada dato, y después recorre todas las filas llevando
+ * el "género actual": una fila donde solo la primera celda tiene texto
+ * (autor/estado/precio/stock vacíos) es un separador de sección, no un
+ * libro — actualiza el género y sigue. Si en el futuro la planilla
+ * tiene una columna "Género" explícita, se usa esa en vez de la
+ * sección.
  */
 export function parseBooksCsv(csvText: string): Book[] {
   const rows = parseCsv(csvText);
   if (rows.length === 0) return [];
 
-  const header = rows[0].map((h) => HEADER_ALIASES[h.trim().toLowerCase()] ?? h.trim().toLowerCase());
+  const headerRow = rows.find(isHeaderRow) ?? rows[0];
+  const header = headerRow.map((h) => HEADER_ALIASES[h.trim().toLowerCase()] ?? h.trim().toLowerCase());
   const colIndex = (name: string) => header.indexOf(name);
 
   const idxTitulo = colIndex('titulo');
@@ -114,21 +135,28 @@ export function parseBooksCsv(csvText: string): Book[] {
   const books: Book[] = [];
   let currentGenero: string | undefined;
 
-  for (const row of rows.slice(1)) {
-    const primeraCelda = (row[0] ?? '').trim();
+  for (const row of rows) {
+    if (isHeaderRow(row)) continue;
 
-    if (primeraCelda.toLowerCase().startsWith('[merged]')) {
-      const seccion = primeraCelda.replace(/^\[merged\]\s*/i, '').trim();
-      // Ignora separadores alfabéticos de una sola letra (ej. "[merged] A"),
-      // que no son género.
-      if (seccion.length > 1) currentGenero = seccion || undefined;
+    const primeraCelda = (row[0] ?? '').trim();
+    if (!primeraCelda) continue;
+    if (primeraCelda.startsWith('/')) continue; // categoría suelta, ej. "/ FICCIÓN"
+
+    const sinOtrasColumnas =
+      !(row[idxAutor] ?? '').trim() &&
+      !(row[idxEstado] ?? '').trim() &&
+      !(row[idxPrecio] ?? '').trim() &&
+      !(row[idxStock] ?? '').trim();
+
+    if (sinOtrasColumnas) {
+      // Solo tiene la primera celda con texto: es un separador de
+      // sección (género), no un libro.
+      currentGenero = primeraCelda;
       continue;
     }
 
-    if (primeraCelda.startsWith('/')) continue; // categoría suelta, ej. "/ FICCIÓN"
-
-    const titulo = (row[idxTitulo] ?? '').trim();
-    if (!titulo || titulo.toLowerCase() === 'libro') continue; // vacía o encabezado repetido
+    const titulo = limpiarTitulo(row[idxTitulo] ?? '');
+    if (!titulo) continue;
 
     const generoColumna = idxGenero >= 0 ? row[idxGenero]?.trim() : undefined;
     const genero = generoColumna || currentGenero;
