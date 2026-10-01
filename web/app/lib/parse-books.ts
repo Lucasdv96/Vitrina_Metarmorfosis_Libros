@@ -83,8 +83,19 @@ const HEADER_ALIASES: Record<string, string> = {
 };
 
 /**
- * Convierte el CSV publicado de la planilla en libros. Ignora filas
- * separadoras (ej. "[merged] A") y filas sin título.
+ * Convierte el CSV publicado de la planilla en libros.
+ *
+ * La hoja "Por género" agrupa los libros en secciones: una fila
+ * "[merged] <Género>" (celda combinada) antes de cada grupo, seguida
+ * del encabezado de columnas repetido ("Libro, Autor/a, ...") y recién
+ * después las filas de libros. También hay filas de categoría suelta
+ * ("/ FICCIÓN", "/ NO FICCIÓN") sin relación con ningún género.
+ *
+ * Este parser recorre las filas llevando el "género actual": lo
+ * actualiza al pasar por una fila [merged], ignora los encabezados
+ * repetidos y las filas de categoría, y asigna ese género a cada libro
+ * real. Si en el futuro la planilla vuelve a tener una columna
+ * "Género" explícita, se usa esa en vez de la sección.
  */
 export function parseBooksCsv(csvText: string): Book[] {
   const rows = parseCsv(csvText);
@@ -101,12 +112,26 @@ export function parseBooksCsv(csvText: string): Book[] {
   const idxGenero = colIndex('genero');
 
   const books: Book[] = [];
+  let currentGenero: string | undefined;
 
   for (const row of rows.slice(1)) {
-    const titulo = (row[idxTitulo] ?? '').trim();
-    if (!titulo || titulo.toLowerCase().startsWith('[merged]')) continue;
+    const primeraCelda = (row[0] ?? '').trim();
 
-    const genero = idxGenero >= 0 ? row[idxGenero]?.trim() : undefined;
+    if (primeraCelda.toLowerCase().startsWith('[merged]')) {
+      const seccion = primeraCelda.replace(/^\[merged\]\s*/i, '').trim();
+      // Ignora separadores alfabéticos de una sola letra (ej. "[merged] A"),
+      // que no son género.
+      if (seccion.length > 1) currentGenero = seccion || undefined;
+      continue;
+    }
+
+    if (primeraCelda.startsWith('/')) continue; // categoría suelta, ej. "/ FICCIÓN"
+
+    const titulo = (row[idxTitulo] ?? '').trim();
+    if (!titulo || titulo.toLowerCase() === 'libro') continue; // vacía o encabezado repetido
+
+    const generoColumna = idxGenero >= 0 ? row[idxGenero]?.trim() : undefined;
+    const genero = generoColumna || currentGenero;
 
     books.push({
       titulo,

@@ -22,7 +22,7 @@ Proyecto freelance sin costo para la dueña, y pieza de portfolio de [Lucas del 
 
 ## Fuente de datos
 
-El catálogo se arma a partir de una planilla que edita la dueña (hoy en migración a Google Sheets publicada como CSV). Mientras esa publicación no esté lista, el sitio usa un snapshot local de los libros reales como fuente de datos (`web/app/lib/raw-books-data.ts`), leído a través del mismo parser tolerante que después va a leer el CSV en vivo — el cambio a datos en vivo es de una sola línea en `web/app/lib/books.ts`.
+El catálogo se arma a partir de una planilla que edita la dueña, publicada como CSV desde Google Sheets (Archivo → Compartir → Publicar en la web). La URL de esa publicación va en la variable de entorno `CATALOG_CSV_URL` (ver `web/.env.example`) — Vercel la revalida cada una hora. Si la variable no está seteada, o si el fetch falla por cualquier motivo, el sitio cae automáticamente a un snapshot local de los libros reales (`web/app/lib/raw-books-data.ts`) para no romperse nunca.
 
 ## Estructura del proyecto
 
@@ -50,7 +50,7 @@ Abrí [http://localhost:3000](http://localhost:3000).
 
 ## Pendientes
 
-- Publicar la planilla real como Google Sheets → CSV y conectar el sitio a esa fuente en vivo.
+- Publicar la planilla real como CSV y setear `CATALOG_CSV_URL` en Vercel.
 - Completar la columna "Género" en la planilla real (hoy no existe).
 - Texto definitivo de "Sobre mí" (el actual es un placeholder).
 - Nombre final del subdominio de producción.
