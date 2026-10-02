@@ -151,8 +151,8 @@ export default function Catalog({ books }: CatalogProps) {
               >
                 {b.stock === 'Vendido' && <span className="stamp">Vendido</span>}
                 {b.portada && <img className="cover-thumb" src={b.portada} alt="" loading="lazy" />}
-                <div>
-                  <div className={`titulo${b.portada ? ' con-portada' : ''}`}>{b.titulo}</div>
+                <div className={b.portada ? 'con-portada' : undefined}>
+                  <div className="titulo">{b.titulo}</div>
                   <div className="autor">{b.autor}</div>
                   <div className="meta">
                     <span className="chip">{b.estado}</span>
