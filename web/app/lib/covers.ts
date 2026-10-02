@@ -8,7 +8,8 @@ const REVALIDATE_SECONDS = 60 * 60 * 24 * 7;
 
 async function resolveCoverUrl(titulo: string, autor: string): Promise<string | undefined> {
   const q = encodeURIComponent(`intitle:${titulo} inauthor:${autor}`);
-  const url = `${GOOGLE_BOOKS_URL}?q=${q}&maxResults=1`;
+  const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
+  const url = `${GOOGLE_BOOKS_URL}?q=${q}&maxResults=1${apiKey ? `&key=${apiKey}` : ''}`;
 
   try {
     const res = await fetch(url, { next: { revalidate: REVALIDATE_SECONDS } });
