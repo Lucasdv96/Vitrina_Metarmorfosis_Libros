@@ -6,10 +6,9 @@ const GOOGLE_BOOKS_URL = 'https://www.googleapis.com/books/v1/volumes';
 // consulta a Google en cada visita.
 const REVALIDATE_SECONDS = 60 * 60 * 24 * 7;
 
-async function resolveCoverUrl(titulo: string, autor: string): Promise<string | undefined> {
-  const q = encodeURIComponent(`intitle:${titulo} inauthor:${autor}`);
+async function queryGoogleBooks(query: string): Promise<string | undefined> {
   const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
-  const url = `${GOOGLE_BOOKS_URL}?q=${q}&maxResults=1${apiKey ? `&key=${apiKey}` : ''}`;
+  const url = `${GOOGLE_BOOKS_URL}?q=${encodeURIComponent(query)}&maxResults=1${apiKey ? `&key=${apiKey}` : ''}`;
 
   try {
     const res = await fetch(url, { next: { revalidate: REVALIDATE_SECONDS } });
@@ -25,6 +24,18 @@ async function resolveCoverUrl(titulo: string, autor: string): Promise<string | 
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Primero prueba la búsqueda exigente (título + autor); si no encuentra
+ * nada, prueba solo por título. No se baja a búsqueda de texto libre
+ * para no arriesgar traer la portada de un libro equivocado.
+ */
+async function resolveCoverUrl(titulo: string, autor: string): Promise<string | undefined> {
+  const porTituloYAutor = await queryGoogleBooks(`intitle:${titulo} inauthor:${autor}`);
+  if (porTituloYAutor) return porTituloYAutor;
+
+  return queryGoogleBooks(`intitle:${titulo}`);
 }
 
 /**
