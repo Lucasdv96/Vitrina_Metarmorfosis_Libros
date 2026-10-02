@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     'Libros usados elegidos con cariño en Mar del Plata. Catálogo, búsqueda y contacto por WhatsApp e Instagram.',
   icons: {
-    icon: '/favicon-16x16.png',
+    icon: '/FaviconV2.0.png',
   },
 };
 
